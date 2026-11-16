@@ -246,7 +246,10 @@ class AddressBook:
         """Return an existing contact that carries exactly the same data.
 
         Used by the Excel importer so that importing the same sheet twice does
-        not create a second copy of every contact.
+        not create a second copy of every contact. Labels ("Mobile", "Office")
+        are a UI concern and are *not* part of the Excel format, so they are
+        ignored here — otherwise exporting and re-importing your own address
+        book would duplicate every contact whose methods had a label.
         """
         data = normalize_payload(payload)
         with connect(self.db_path) as conn:
@@ -257,11 +260,9 @@ class AddressBook:
             candidates = [dict(row) for row in rows]
             self._attach_methods(conn, candidates)
 
-        wanted = sorted((m["kind"], m["label"].lower(), m["value"].lower()) for m in data["methods"])
+        wanted = sorted((m["kind"], m["value"].lower()) for m in data["methods"])
         for candidate in candidates:
-            have = sorted(
-                (m["kind"], m["label"].lower(), m["value"].lower()) for m in candidate["methods"]
-            )
+            have = sorted((m["kind"], m["value"].lower()) for m in candidate["methods"])
             if (
                 have == wanted
                 and candidate["company"] == data["company"]

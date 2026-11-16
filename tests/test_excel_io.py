@@ -204,6 +204,30 @@ class PersistenceTests(unittest.TestCase):
         self.assertEqual(second["skippedDuplicates"], ["Ada"])
         self.assertEqual(self.book.stats()["total"], 1)
 
+    def test_reimporting_an_export_skips_contacts_whose_labels_were_lost(self):
+        # A label ("Mobile") is a UI concern and is not part of the sheet, so the
+        # round trip must still recognise the contact as already present.
+        self.book.create_contact(
+            {
+                "name": "Ada",
+                "company": "Acme",
+                "title": "Engineer",
+                "notes": "",
+                "favorite": False,
+                "methods": [
+                    {"kind": "phone", "label": "Mobile", "value": "111"},
+                    {"kind": "email", "label": "Work", "value": "ada@example.com"},
+                ],
+            }
+        )
+        data = export_workbook(self.book.list_contacts())
+
+        summary, created = read_import_file(self.book, data)
+
+        self.assertEqual(created, [])
+        self.assertEqual(summary["created"], 0)
+        self.assertEqual(summary["skippedDuplicates"], ["Ada"])
+
 
 if __name__ == "__main__":
     unittest.main()

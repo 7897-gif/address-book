@@ -140,6 +140,14 @@ class AddressBookTests(unittest.TestCase):
         self.assertIsNotNone(self.book.find_duplicate(payload))
         self.assertIsNone(self.book.find_duplicate(sample(methods=[{"kind": "phone", "value": "999"}])))
         self.assertIsNone(self.book.find_duplicate(sample(name="Someone Else")))
+        # Labels are cosmetic: the same values under different labels are a duplicate.
+        relabelled = sample(
+            methods=[
+                {"kind": "phone", "label": "Office", "value": "+44 20 7946 0000"},
+                {"kind": "email", "label": "", "value": "ada@example.com"},
+            ]
+        )
+        self.assertIsNotNone(self.book.find_duplicate(relabelled))
 
 
 if __name__ == "__main__":
