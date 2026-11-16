@@ -41,7 +41,7 @@ Additional behaviour worth mentioning:
 ## Quick start
 
 ```bash
-git clone <this-repository-url>
+git clone https://github.com/7897-gif/address-book
 cd address-book
 python -m pip install -r requirements.txt
 
@@ -179,7 +179,7 @@ in the assignment).
 
 ```bash
 # on the server
-git clone <this-repository-url> && cd address-book
+git clone https://github.com/7897-gif/address-book && cd address-book
 python3 -m pip install -r requirements.txt
 
 # run it under systemd / supervisor / tmux

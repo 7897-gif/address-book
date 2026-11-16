@@ -33,7 +33,7 @@ single person, and move the whole address book in and out of Excel without losin
 
 | Link | Address |
 | --- | --- |
-| GitHub repository | `https://github.com/<your-account>/address-book` *(replace before publishing)* |
+| GitHub repository | `https://github.com/7897-gif/address-book |
 | Live demo (local) | `http://127.0.0.1:8000/` |
 | Demo recording | [`docs/demo/address-book-demo.gif`](demo/address-book-demo.gif) — animated screen capture of the app in use |
 | Excel template | `docs/address-book-template.xlsx` |
@@ -62,13 +62,14 @@ UI → tests → documentation), not one dump at the end:
 | 5 | `test: repository, Excel round-trip and HTTP API suites` | `tests/` |
 | 6 | `docs: README, blog post, screenshots and demo script` | `README.md`, `docs/` |
 | 7 | `fix: ignore cosmetic labels when detecting duplicate contacts on import` | `repository.py`, tests |
+| 8 | `docs: point repository links at the GitHub remote` | `README.md`, `docs/blog.md` |
 
-![Commit history: seven commits by one author](screenshots/07-commit-history.png)
+![Commit history on GitHub](screenshots/07-commit-history.png)
 
 The image above is `git log --graph --oneline --stat` from the repository; the same list is
 visible on the GitHub *Commits* page after pushing.
 
-Commit count by contributor: **Li Jianhang — 7 commits, 100 %** (individual project).
+Commit count by contributor: **Li Jianhang — every commit, 100 %** (individual project).
 
 
 ## 2. Requirements analysis
@@ -350,7 +351,7 @@ python app.py --open     # http://127.0.0.1:8000/
 
 ```bash
 # on the server
-git clone <repository-url> && cd address-book
+git clone https://github.com/7897-gif/address-book && cd address-book
 python3 -m pip install -r requirements.txt
 python3 app.py --host 0.0.0.0 --port 8000     # or: docker run -d -p 8000:8000 ...
 ```
