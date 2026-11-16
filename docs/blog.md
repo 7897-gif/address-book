@@ -64,7 +64,7 @@ UI → tests → documentation), not one dump at the end:
 | 7 | `fix: ignore cosmetic labels when detecting duplicate contacts on import` | `repository.py`, tests |
 | 8 | `docs: point repository links at the GitHub remote` | `README.md`, `docs/blog.md` |
 
-![Commit history on GitHub](screenshots/07-commit-history.png)
+![Commit history: nine commits by one author](screenshots/07-commit-history.png)
 
 The image above is `git log --graph --oneline --stat` from the repository; the same list is
 visible on the GitHub *Commits* page after pushing.
