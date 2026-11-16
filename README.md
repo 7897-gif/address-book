@@ -36,7 +36,7 @@ Additional behaviour worth mentioning:
 * Database: SQLite (built into Python).
 * Excel: [openpyxl](https://openpyxl.readthedocs.io/) — the only third-party dependency.
 * Frontend: vanilla HTML / CSS / JavaScript, no build step, no CDN (works offline).
-* Tests: `unittest` (37 tests: repository, Excel, HTTP API).
+* Tests: `unittest` (38 tests: repository, Excel, HTTP API).
 
 ## Quick start
 
@@ -169,6 +169,8 @@ Import rules:
 4. Numbered columns (`Phone 2`, `Email 3`, …) become separate contact methods.
 5. A row without a name is reported and skipped; blank rows are ignored; re-importing the
    same sheet does not create duplicates.
+6. Labels ("Mobile", "Office") are an in-app concept: a sheet stores one value per numbered
+   column, and the importer ignores labels when it checks whether a contact already exists.
 
 ## Deployment
 

@@ -27,7 +27,7 @@ python app.py --open        # http://127.0.0.1:8000/
 | 6 | 1:20–1:35 | **Export** → open `address-book.xlsx` in Excel, point at the columns `Phone 1`, `Phone 2`, `Email 1` | 1.3 Export |
 | 7 | 1:35–1:55 | Back in the app, **Import** → choose `docs/address-book-export.xlsx` → show the summary dialog (duplicates skipped, 0 errors) | 1.3 Import + duplicate protection |
 | 8 | 1:55–2:05 | Open the trash icon on "Test Person" → confirm | Delete + cascade |
-| 9 | 2:05–2:15 | Terminal: `python -m unittest discover -s tests -t .` → `OK` | 37 tests pass |
+| 9 | 2:05–2:15 | Terminal: `python -m unittest discover -s tests -t .` → `OK` | 38 tests pass |
 
 ## After recording
 

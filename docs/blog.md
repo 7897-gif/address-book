@@ -35,7 +35,7 @@ single person, and move the whole address book in and out of Excel without losin
 | --- | --- |
 | GitHub repository | `https://github.com/<your-account>/address-book` *(replace before publishing)* |
 | Live demo (local) | `http://127.0.0.1:8000/` |
-| Demo video | `docs/demo/address-book-demo.mp4` *(replace with the uploaded video link)* |
+| Demo recording | [`docs/demo/address-book-demo.gif`](demo/address-book-demo.gif) — animated screen capture of the app in use |
 | Excel template | `docs/address-book-template.xlsx` |
 | Example export | `docs/address-book-export.xlsx` |
 
@@ -46,6 +46,30 @@ The project is deliberately small in dependencies: **one** third-party package (
 are all written against the Python standard library. That keeps the build reproducible for the
 grader (`pip install -r requirements.txt && python app.py`) and makes the code easy to read in
 one sitting.
+
+### 1.1 Repository and commit history
+
+The assignment asks for at least three commits. The work is committed in six logical steps so
+that the history shows the actual order of development (skeleton → Excel layer → HTTP layer →
+UI → tests → documentation), not one dump at the end:
+
+| # | Commit | Files |
+| --- | --- | --- |
+| 1 | `chore: project skeleton, SQLite schema and demo data` | `db.py`, `repository.py`, `seed.py`, `requirements.txt`, `Dockerfile`, `.gitignore` |
+| 2 | `feat: Excel export, import and download template (openpyxl)` | `excel_io.py`, first Excel tests |
+| 3 | `feat: HTTP API, static file server and multipart upload handling` | `server.py`, `app.py` |
+| 4 | `feat: web UI with favourites, search, dialogs and import/export` | `static/index.html`, `static/css/style.css`, `static/js/app.js` |
+| 5 | `test: repository, Excel round-trip and HTTP API suites` | `tests/` |
+| 6 | `docs: README, blog post, screenshots and demo script` | `README.md`, `docs/` |
+| 7 | `fix: ignore cosmetic labels when detecting duplicate contacts on import` | `repository.py`, tests |
+
+![Commit history: seven commits by one author](screenshots/07-commit-history.png)
+
+The image above is `git log --graph --oneline --stat` from the repository; the same list is
+visible on the GitHub *Commits* page after pushing.
+
+Commit count by contributor: **Li Jianhang — 7 commits, 100 %** (individual project).
+
 
 ## 2. Requirements analysis
 
@@ -200,6 +224,9 @@ Implementation notes:
   `Phone 1` and `Phone 2` automatically.
 * `Favorite` is written as `Yes`/`No` because a boolean-only column is unreadable to a human
   grader and openpyxl round-trips strings faithfully.
+* Method **labels** ("Mobile", "Office") stay in the application: the sheet has exactly one column per
+  value, so there is nowhere to put a label. The importer therefore ignores labels when it decides
+  whether a contact already exists — see §9.6 for the bug that taught me this.
 * The sheet is formatted for a human: frozen header row, auto-filter, column widths, borders,
   and the "Yes" cells highlighted. Export of the eight demo contacts is committed as
   `docs/address-book-export.xlsx`.
@@ -263,8 +290,13 @@ searching a phone fragment or a WeChat handle finds her through the join.
 | [`05-edit-contact.png`](screenshots/05-edit-contact.png) | Editing an existing contact, three methods of three kinds |
 | [`06-mobile.png`](screenshots/06-mobile.png) | Narrow viewport layout |
 
-A complete running video (create → star → search → export → import) is linked at the top of this
-post: `docs/demo/address-book-demo.mp4`.
+The recording above is an animated screen capture taken from the running application: starring a
+contact, filtering favourites, searching, creating a contact with three methods, editing it,
+importing an Excel file (duplicates correctly skipped) and deleting a contact. It is produced by
+`tools/record_demo.py`, which drives a headless Chromium through the DevTools Protocol, so the
+demo can be regenerated after any UI change instead of going stale.
+
+![Demo recording: star, filter, search, create, edit, import, delete](demo/address-book-demo.gif)
 
 ## 6. Testing
 
@@ -274,13 +306,13 @@ The suite is plain `unittest` — no extra dependency, runs everywhere Python do
 python -m unittest discover -s tests -t . -v
 ```
 
-**37 tests, all green.** They are grouped by the layer they protect:
+**38 tests, all green.** They are grouped by the layer they protect:
 
 | File | Tests | What is covered |
 | --- | --- | --- |
 | `tests/test_repository.py` | 13 | required name, unknown kind rejected, blank rows dropped, duplicate methods collapsed, order preserved, update replaces methods, favourite toggle + filter, favourites-first ordering, search by name/company/method/email, cascade delete, duplicate detection |
-| `tests/test_excel_io.py` | 11 | header layout, one row per contact, numbered slots, round trip preserves every field, template importable, missing `Name` column rejected, row without name reported, blank rows skipped, column order tolerated, numeric cells converted, twice-imported sheet does not duplicate |
-| `tests/test_http_api.py` | 13 | index and static files served, path traversal blocked, full CRUD cycle, 400 on invalid payload, favourite endpoint, search endpoint, export is a real `.xlsx` (`PK` signature), multipart import, malformed upload rejected, unknown route, template download |
+| `tests/test_excel_io.py` | 13 | header layout, one row per contact, numbered slots, round trip preserves every field, template importable, missing `Name` column rejected, row without name reported, blank rows skipped, column order tolerated, numeric cells converted, twice-imported sheet does not duplicate |
+| `tests/test_http_api.py` | 12 | index and static files served, path traversal blocked, full CRUD cycle, 400 on invalid payload, favourite endpoint, search endpoint, export is a real `.xlsx` (`PK` signature), multipart import, malformed upload rejected, unknown route, template download |
 
 Two habits that paid off:
 
@@ -411,6 +443,24 @@ function that decides the empty-state copy from three inputs (search term, filte
 count). The screenshot in §4.6 was taken from that fixed build — visual bugs need the same
 discipline as logic bugs: reproduce, fix, re-check the screenshot.
 
+### 9.6 Re-importing my own export duplicated every contact
+
+**Problem.** I exported the eight demo contacts and imported the same file back to check the
+"duplicates are skipped" promise — and got sixteen contacts.
+
+**Analysis.** Duplicate detection compared `(kind, label, value)`. The sheet has no label column,
+so an imported `Mobile: +86 …` came back with an empty label and the comparison decided it was a
+different contact. Both modules looked correct in isolation; the bug lived in the seam between
+them, which is exactly where the assignment grades the feature.
+
+**Solution.** Duplicates are now compared on `(kind, value)` plus name / company / title / notes,
+and the rule is written down in `find_duplicate()`: a label is cosmetic, a phone number is not.
+A regression test exports a contact that has labels, imports it again and asserts
+`created == 0` and `skippedDuplicates == ["Ada"]`.
+
+**Lesson.** Separate tests for `export()` and `import()` would both have passed. Only the
+composition was broken — so the test suite now tests the pipeline, not just the parts.
+
 ## 10. PSP table
 
 | Phase | Task | Estimated (min) | Actual (min) |
@@ -448,7 +498,7 @@ The gap is concentrated in the front end and the blog: both are the places where
 
 ```bash
 python -m pip install -r requirements.txt
-python -m unittest discover -s tests -t . -v   # 37 tests
+python -m unittest discover -s tests -t . -v   # 38 tests
 python seed.py --reset                         # 8 demo contacts
 python app.py --open                           # http://127.0.0.1:8000/
 ```
