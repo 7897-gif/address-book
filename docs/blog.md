@@ -1,9 +1,13 @@
 # Address Book: An Extreme Programming Practice
 
+**Li Jianhang (李健航) · Student ID 832401210 · Individual project**
+
 | Item | Content |
 | --- | --- |
 | Course for This Assignment | Software Engineering (FZU–MU) |
-| Team Name | Solo — Li Jianhang (李健航), Student ID 832401210 |
+| Student | Li Jianhang (李健航) |
+| Student ID | 832401210 |
+| Team Name | Individual project (solo) |
 | Assignment Requirements | [Extreme Programming assignment, deadline 2026-11-17 23:59](https://bbs.csdn.net/topics/620593436) |
 | Objectives of This Assignment | Practise the full Extreme Programming loop — fork, plan, code, test, release a pull request, document — and deliver a working address book with bookmarked contacts, multiple contact methods per person, and Excel import/export. |
 | Other References | [openpyxl documentation](https://openpyxl.readthedocs.io/), [Python `http.server`](https://docs.python.org/3/library/http.server.html), [MDN: Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) |
