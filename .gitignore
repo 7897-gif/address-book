@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+data/*.db
+data/*.db-journal
+.testtmp/
+.edge-profile/
+docs/screenshots/00-*.png
+.DS_Store
+Thumbs.db
